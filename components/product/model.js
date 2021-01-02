@@ -38,8 +38,4 @@ export default class ProductModel {
     return products.sort((a, b) => a[param] - b[param]);
   }
 
-  calculatePrice(price, count) {
-    return price * count;
-  }
-
 }

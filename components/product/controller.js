@@ -8,9 +8,7 @@ export default class ProductController {
       showInfo: this.showProductInfo.bind(this),
       sort: this.sortProducts.bind(this),
       search: this.searchProducts.bind(this),
-      prepareOrder: this.prepareOrder.bind(this),
-      changeProdCount: this.changeProdCount.bind(this),
-      addToCart: this.addToCart.bind(this),
+      choose: this.chooseProduct.bind(this),
     };
     this.view = new ProductView(this.listeners);
     this.model = new ProductModel();
@@ -53,21 +51,10 @@ export default class ProductController {
     this.view.renderProducts(sortedProducts);
   }
 
-  addToCart() {
-
-  }
-
-  prepareOrder(e) {
+  chooseProduct(e) {
     const id = e.target.dataset.id;
-    const productData = this.model.getProduct(id);
-    this.view.renderOrderForm(productData);
-  }
-
-  changeProdCount(e) {
-    const count = e.target.value;
-    const id = e.target.dataset.currentProduct;
     const product = this.model.getProduct(id);
-    const newPrice = this.model.calculatePrice(product.price, count);
-    this.view.renderOrderPrice(newPrice);
+    console.log(product);
+    this.publisher.notify('CHOOSE_TO_ADD', product);
   }
 }
