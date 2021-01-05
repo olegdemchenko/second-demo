@@ -6,6 +6,7 @@ export default class CategoryController {
     this.publisher = publisher;
     this.callbacks = {
       choose: this.chooseCategory.bind(this),
+      showCategories: this.showCategories.bind(this),
     };
     this.model = new CategoryModel();
     this.view = new CategoryView(this.callbacks);

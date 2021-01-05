@@ -1,5 +1,6 @@
 import ProductView from './view.js';
 import ProductModel from './model.js';
+import PaginationController from '../pagination/controller.js';
 
 export default class ProductController {
   constructor(publisher) {
@@ -7,54 +8,44 @@ export default class ProductController {
     this.listeners = {
       showInfo: this.showProductInfo.bind(this),
       sort: this.sortProducts.bind(this),
-      search: this.searchProducts.bind(this),
+      search: this.filterProducts.bind(this),
       choose: this.chooseProduct.bind(this),
     };
     this.view = new ProductView(this.listeners);
     this.model = new ProductModel();
+    this.pagination = new PaginationController(this.view.renderProducts.bind(this.view));
     this.publisher.subscribe('LOAD_GOODS', this.setProducts.bind(this));
-    this.publisher.subscribe('CHOOSE_CATEGORY', this.selectProducts.bind(this));
-    this.publisher.subscribe('CHOOSE_CATEGORY', this.setProductParams.bind(this));
+    this.publisher.subscribe('SHOW_CATEGORIES', this.model.cleanActions.bind(this.model));
+    this.publisher.subscribe('CHOOSE_CATEGORY', this.filterProducts.bind(this));
   }
 
   setProducts(products) {
     this.model.setProducts(products);
   }
 
-  setProductParams(params) {
-    this.model.setProductParams(params);
+  filterProducts(params) {
+    this.model.addActions([this.model.filterProducts, [params]]);
+    this.showProducts();
   }
 
-  searchProducts(e) {
-    e.preventDefault();
-    const formData = new FormData(e.target);
-    const property = formData.get('search-type');
-    const value = formData.get('search-value');
-    return this.selectProducts({ property, value });
+  showProducts() {
+    const currentProducts = this.model.getCurrentProducts();
+    this.pagination.setElements(currentProducts);
+    this.pagination.showElements();
   }
 
-  selectProducts(productData) {
-    const products = this.model.getProducts(productData);
-    this.view.renderProducts(products);
+  sortProducts(sortParam) {
+    this.model.addActions([this.model.sortProducts, [sortParam]]);
+    this.showProducts();
   }
 
-  showProductInfo(e) {
-    const id = e.target.dataset.id;
+  showProductInfo(id) {
     const product = this.model.getProduct(id);
     this.view.renderProductInfo(product);
   }
 
-  sortProducts(e) {
-    const sortParam = e.target.dataset.sort;
-    const currentProducts = this.model.getProducts(this.model.getProductParams());
-    const sortedProducts = this.model.sortProducts(sortParam, currentProducts);
-    this.view.renderProducts(sortedProducts);
-  }
-
-  chooseProduct(e) {
-    const id = e.target.dataset.id;
-    const product = this.model.getProduct(id);
-    console.log(product);
-    this.publisher.notify('CHOOSE_TO_ADD', product);
+  chooseProduct(currId) {
+    const { product_name, price, id } = this.model.getProduct(currId);
+    this.publisher.notify('CHOOSE_TO_ADD', { product_name, price, id });
   }
 }

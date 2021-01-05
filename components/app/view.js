@@ -1,9 +1,12 @@
 export default class StoreView {
-  constructor() {
+  constructor(callbacks) {
+    this.callbacks = callbacks;
     this.isSpinnerShown = false;
     this.dom = {
       modalSpinner: document.getElementById('spinner'),
+      brand: document.querySelector('.store-brand'),
     }
+    this.dom.brand.addEventListener('click', this.callbacks.showMainPage);
     this.dom.modalSpinner.addEventListener('shown.bs.modal', () => {
       this.isSpinnerShown = true;
     });

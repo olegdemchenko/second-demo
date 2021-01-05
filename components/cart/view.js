@@ -1,6 +1,7 @@
 export default class CartView {
   constructor(callbacks) {
     this.dom = {
+      mainContent: document.querySelector('.main-container'),
       buyModal: document.getElementById('buyProduct'),
       openCart: document.querySelector('.open-cart'),
     };
@@ -8,7 +9,84 @@ export default class CartView {
     this.dom.openCart.addEventListener('click', this.callbacks.showCart); 
   }
 
-  renderOrderForm({ product_name, price, id, count }) {
+  renderCart(products) {
+    this.dom.mainContent.innerHTML = `
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Name</th>
+          <th scope="col">Count</th>
+          <th scope="col">Total price</th>
+          <th scope="col">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${products.map(this.renderCartProduct).join('')}
+      </tbody>
+    </table>
+    <div class="row justify-content-center">
+      <button type="button" class="col-2 btn btn-success ${products.length === 0 ? 'invisible': ''} make-order" data-bs-toggle="modal" data-bs-target="#buyProduct">
+        Make an order
+      </button>
+    </div>
+    `;
+    const changeBtns = [...document.querySelectorAll('.change-btn')];
+    const deleteBtns = [...document.querySelectorAll('.delete-btn')];
+    const makeOrderBtn = document.querySelector('.make-order');
+    changeBtns.forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        const id = e.target.dataset.id;
+        this.callbacks.selectProduct(id);
+      });
+    });
+    deleteBtns.forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        const id = e.target.dataset.id;
+        this.callbacks.delete(id);
+      })
+    });
+    makeOrderBtn.addEventListener('click', () => this.renderCustomerForm());
+  }
+
+  renderCartProduct(product, index) {
+    return `
+      <tr>
+        <td>${index + 1}</td>
+        <td>${product.product_name}</td>
+        <td>${product.count}</td>
+        <td>${product.total_price}</td>
+        <td>
+          <button class="btn btn-primary change-btn" data-id="${product.id}" data-bs-toggle="modal" data-bs-target="#buyProduct">Change count</button>
+          <button class="btn btn-danger delete-btn" data-id="${product.id}">Delete product</button>
+        </td>
+      </tr>
+    `;
+  }
+
+  renderCustomerForm() {
+    this.dom.buyModal.firstElementChild.innerHTML = `
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Please, enter your personal data</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <label for="userName">Please, enter your name:</label>
+            <input type="text" class="form-control" name="user-name" id="userName" required pattern="/[a-zA-Z]{2,}/">
+            <label for="userPhone">Please, enter your phone number:</label>
+            <div class="input-group mb-3">
+              <span class="input-group-text">(...)-(...)-(..)-(..)</span>
+              <input type="tel" class="form-control" id="userPhone" name="user-phone" required pattern="[0-9]{3}-[0-9]{3}-[0-9]{2}-[0-9]{2}">
+            </div>            
+          </form>
+        </div>
+      </div>
+    `
+  }
+
+  renderOrderForm({ product_name, price, id, total_price, count }, addCallback) {
     this.dom.buyModal.firstElementChild.innerHTML = `
     <div class="modal-content">
       <div class="modal-header">
@@ -19,7 +97,7 @@ export default class CartView {
         <form>
             <div class="mb-3">
               <label for="disabledId" class="form-label">Product id</label>
-              <input type="text" id="disabledId" name="product-id" value="${id}" class="form-control order-product-id" readonly>
+              <input type="number" id="disabledId" name="product-id" value="${id}" class="form-control order-product-id" readonly>
             </div>
             <div class="mb-3">
               <label for="disabledName" class="form-label">Product name</label>
@@ -34,7 +112,7 @@ export default class CartView {
             <input type="number" class="form-control" name="product-count" id="productCount" value="${count ?? 1}" min="0"> 
             <span class="text-danger error-message"></span>  
           </div>
-          <p class="fs-2">Total price: <span class="order-total-price">${price}</span></p>
+          <p class="fs-2">Total price: <span class="order-total-price">${total_price ?? price}</span></p>
         </form>
       </div>
       <div class="modal-footer">
@@ -42,19 +120,14 @@ export default class CartView {
         <button type="button" class="btn btn-primary add-btn" data-bs-dismiss="modal">Add</button>
       </div>
     </div> `;
-    const form = this.dom.buyModal.querySelector('form');
+    const countInput = this.dom.buyModal.querySelector('input[name="product-count"]');
     const addBtn = this.dom.buyModal.querySelector('.add-btn');
-    form.addEventListener('input', (e) => {
-      const formData = new FormData(e.currentTarget);
-      this.callbacks.changeProdCount(formData.get('product-count'), formData.get('product-price'));
+    countInput.addEventListener('input', (e) => {
+      const count = e.target.value;
+      this.callbacks.changeProdPrice(count);
     });
     addBtn.addEventListener('click', () => {
-      const formData = new FormData(this.dom.buyModal.querySelector('form'));
-      const id = formData.get('product-id');
-      const product_name = formData.get('product-name');
-      const price = formData.get('product-price');
-      const product_count = formData.get('product-count');
-      this.callbacks.add({ id, product_name, price, count: product_count });
+      addCallback();
     });
   }
 

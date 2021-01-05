@@ -5,46 +5,72 @@ export default class CartController {
   constructor(publisher) {
     this.publisher = publisher;
     this.listeners = {
-      changeProdCount: this.changeProdCount.bind(this),
+      delete: this.deleteFromCart.bind(this),
+      changeProdPrice: this.changeProdPrice.bind(this),
+      selectProduct: this.prepareAddedInfo.bind(this, this.createMethodSequence([this.changeExistProd, this.showCart])),
       showCart: this.showCart.bind(this),
-      add: this.addToCard.bind(this),
     }
     this.model = new CartModel();
     this.view = new CartView(this.listeners);
-    this.publisher.subscribe('CHOOSE_TO_ADD', this.prepareCountForm.bind(this));
+    this.publisher.subscribe(
+      'CHOOSE_TO_ADD',
+      this.prepareNewInfo.bind(this, this.addNewProd.bind(this))
+    );
   }
 
-  addToCard(prodData) {
-    const isPreviouslyAdded = this.model.hasProduct(prodData.id);
-    if (isPreviouslyAdded) {
-      this.model.changeProdParams(prodData.id, prodData);
-      return;
+  
+
+  addNewProd() {
+    const newProd = this.model.getProductOnChange();
+    this.model.addProduct(newProd);
+  }
+
+  changeExistProd() {
+    const changedProd = this.model.getProductOnChange();
+    this.model.changeExistedProduct(changedProd);
+  }
+
+  deleteFromCart(id) {
+    this.model.deleteProduct(id);
+    this.showCart();
+  }
+
+  createMethodSequence(methods) {
+    const invoker = function(args) {
+      methods.forEach((method) => {
+        method.call(this, args);
+      }); 
     }
-    this.model.addProduct(prodData);
+    return invoker.bind(this);
   }
 
-  prepareCountForm(productData) {
-    const isPreviouslyAdded = this.model.hasProduct(productData.id);
-    if (isPreviouslyAdded) {
-      const prevProduct = this.model.getProduct(product.id);
-      this.view.renderOrderForm(prevProduct);
-      return;
-    }
-    this.view.renderOrderForm(productData);
+  prepareNewInfo(callback, newProduct) {
+    const normalProd = this.model.setUpParams(newProduct, { total_price: newProduct.price, count: 1 });
+    this.model.setProductOnChange(normalProd);
+    this.view.renderOrderForm(normalProd, callback);
   }
 
-  changeProdCount(count, price) {
+  prepareAddedInfo(callback, id) {
+    const addedProd = this.model.getProduct(id);
+    this.model.setProductOnChange(addedProd);
+    this.view.renderOrderForm(addedProd, callback);
+  }
+
+  changeProdPrice(count) {
     const validError = this.model.validateCount(count);
     if (validError) {
       this.view.renderCountError(validError);
       return;
     }
-    const newPrice = this.model.calculatePrice(price, count);
-    this.view.renderOrderPrice(newPrice);
+    const { price } = this.model.getProductOnChange();
+    const total_price = this.model.calculatePrice(price, count);
+    const changedProd = this.model.setUpParams(this.model.getProductOnChange(), { count, total_price });
+    this.model.setProductOnChange(changedProd);
+    this.view.renderOrderPrice(total_price);
   }
 
   showCart() {
     const cartProducts = this.model.getAllProducts();
-    console.log();
+    this.view.renderCart(cartProducts);
   }
 }

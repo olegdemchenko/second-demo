@@ -4,15 +4,14 @@ export default class CategoryView {
       dropdown: document.querySelector('.dropdown-menu'),
       mainContainer: document.querySelector('.main-container'),
     };
-   
     this.callbacks = callbacks;
   }
 
   render(categories) {
     this.dom.dropdown.innerHTML = categories.map(this.createLink).join('');
     this.dom.mainContainer.innerHTML = categories.map(this.createCard).join('');
-    const domCategories = document.querySelectorAll(`a[data-category]`);
-    [...domCategories].forEach((category) => category.addEventListener('click', this.callbacks.choose));
+    const domCategories = [...document.querySelectorAll(`a[data-category]`)];
+    domCategories.forEach((category) => category.addEventListener('click', this.callbacks.choose));
   }
 
   createLink(name) {
@@ -21,7 +20,7 @@ export default class CategoryView {
 
   createCard(name) {
     return (
-      `<div class="col">
+      `<div class="col-12 col-sm-6 col-md-4 col-xl-3">
          <div class="card align-items-center text-center border-white">
            <img src="./img/${name}.svg" class="card-img-top" style="width: 200px; height:200px" alt="...">
            <div class="card-body">

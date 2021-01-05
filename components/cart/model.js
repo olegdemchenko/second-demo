@@ -1,28 +1,46 @@
 export default class CartModel {
   constructor() {
     this.products = [];
+    this.productOnChange = null;
+  }
+
+  getProductOnChange() {
+    return this.productOnChange;
+  }
+
+  setProductOnChange(prod) {
+    this.productOnChange = prod;
   }
 
   hasProduct(id) {
     return this.getAllProducts().some(({ id: prodId }) => prodId === id);
   }
 
-  changeProdParams(prodId, newParams) {
-    const newProducts = this.getAllProducts.map((oldProd) => {
-      if (oldProd.id === prodId) {
-        return { ...oldProd, ...newParams };
+  deleteProduct(prodId) {
+    const products = this.getAllProducts();
+    this.setAllProducts(products.filter(({ id }) => id !== prodId));
+  }
+
+  changeExistedProduct(newProd) {
+    const newProducts = this.getAllProducts().map((oldProd) => {
+      if (oldProd.id === newProd.id) {
+        return { ...oldProd, ...newProd };
       }
       return oldProd;
     });
-    this.setAllProducts = newProducts;
+    this.setAllProducts(newProducts);
   }
 
   getAllProducts() {
     return this.products;
   }
 
-  getProduct(id) {
-    return this.get
+  setAllProducts(newProducts) {
+    this.products = newProducts;
+  }
+
+  getProduct(prodId) {
+    return this.getAllProducts().find(({ id }) => id === prodId);
   }
 
   validateCount(count) {
@@ -38,4 +56,8 @@ export default class CartModel {
     this.products.push(product);
   }
 
+
+  setUpParams(prod, params) {
+    return { ...prod, ...params };
+  }
 }

@@ -5,26 +5,43 @@ export default class ProductView {
       searchForm: document.querySelector('.search-form'),
     }
     this.callbacks = callbacks;
-    this.dom.searchForm.addEventListener('submit', this.callbacks.search);
+    this.dom.searchForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const property = e.target.elements['search-type'].value;
+      const value = e.target.elements['search-value'].value;
+      this.callbacks.search({ property, value });
+    });
   }
 
-  renderProducts(products) {
-    console.log(products);
+  renderProducts(products, page, lastPage) {
+    if (products.length === 0) {
+      this.dom.mainContainer.innerHTML = '<div class="p-4 fs-2">Sorry, but we don`t have any products, which match current requirements</div>';
+      return;
+    }
     this.dom.mainContainer.innerHTML = 
-    `<div class="col"><a href="#" class="d-block btn btn-primary" data-sort="price">Sort by price</a></div>
+    `<div class="row justify-content-center p-3"><a href="#" class="col-2 d-block btn btn-primary" data-sort="price">Sort by price</a></div>
      ${products.map(this.renderProductCard).join('')}
     `;
     const sortButton = document.querySelector('a[data-sort]');
-    sortButton.addEventListener('click', this.callbacks.sort);
+    sortButton.addEventListener('click', (e) => {
+      const sortParam = e.target.dataset.sort;
+      this.callbacks.sort(sortParam);
+    });
     const infoButtons = [...document.querySelectorAll('.product-info')];
     const buyButtons = [...document.querySelectorAll('.product-buy')];
-    buyButtons.forEach((btn) => btn.addEventListener('click', this.callbacks.choose));
-    infoButtons.forEach((btn) => btn.addEventListener('click', this.callbacks.showInfo));
+    buyButtons.forEach((btn) => btn.addEventListener('click', (e) => {
+      const currId = e.target.dataset.id;
+      this.callbacks.choose(currId);
+    }));
+    infoButtons.forEach((btn) => btn.addEventListener('click', (e) => {
+      const id = e.target.dataset.id;
+      this.callbacks.showInfo(id);
+    }));
   }
 
   renderProductCard(product) {
     return (
-      `<div class="col">
+      `<div class="col-12 col-sm-6 col-md-4">
          <div class="card align-items-center text-center border-white">
            <img src="${product.img_link}" class="card-img-top" style="width: 200px; height:200px" alt="...">
            <div class="card-body">

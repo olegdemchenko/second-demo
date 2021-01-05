@@ -1,33 +1,46 @@
 export default class ProductModel {
   constructor() {
     this.products = [];
-    this.currentParams = {};
+    this.actions = [];
+  }
+
+  getActions() {
+    return this.actions;
+  }
+
+  setActions(newActions) {
+    this.actions = newActions;
+  }
+
+  cleanActions() {
+    this.actions = [];
+  }
+
+  addActions(actions) {
+    const currentActions = this.getActions();
+    const newActions = [...currentActions, actions];
+    this.setActions(newActions);
   }
 
   getAllProducts() {
     return this.products;
   }
 
-  getProducts({ property, value }) {
-    if (property === 'category' && value === 'top') {
-      return this.getAllProducts().slice(0, 15);
-    }
-    if (property === 'category' && value === 'discount') {
-      return this.getAllProducts().slice(-30, -10);
-    }
-    return this.getAllProducts().filter(({ [property]: propValue }) => propValue.includes(value));
+  getCurrentProducts() {
+    const products = this.getAllProducts();
+    const actions = this.getActions();
+    return actions.reduce((acc, [action, params]) => {
+      return action(...params, acc);
+    }, products);
+  }
+
+  filterProducts({ property, value }, products) {
+    return products.filter(({ [property]: propValue }) => propValue.includes(value));
   }
 
   setProducts(products) {
+    console.log(products);
     this.products = products;
-  }
-
-  setProductParams(params) {
-    this.currentParams = params;
-  }
-
-  getProductParams() {
-    return this.currentParams;
   }
 
   getProduct(prodId) {
