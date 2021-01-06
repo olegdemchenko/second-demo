@@ -48,6 +48,11 @@ export default class CartModel {
     return Number.isFinite(parsedCount) && parsedCount > 0 ? null : 'Please, use only natural numbers';
   }
 
+  getCartPrice() {
+    const cartProducts = this.getAllProducts();
+    return cartProducts.reduce((summ, { total_price }) => summ + total_price, 0);
+  }
+
   calculatePrice(price, count) {
     return price * count;
   }

@@ -9,7 +9,7 @@ export default class CartView {
     this.dom.openCart.addEventListener('click', this.callbacks.showCart); 
   }
 
-  renderCart(products) {
+  renderCart(products, totalPrice) {
     this.dom.mainContent.innerHTML = `
     <table class="table table-hover">
       <thead>
@@ -25,6 +25,7 @@ export default class CartView {
         ${products.map(this.renderCartProduct).join('')}
       </tbody>
     </table>
+    <div class="text-center fs-2">Total price: ${totalPrice}</div>
     <div class="row justify-content-center">
       <button type="button" class="col-2 btn btn-success ${products.length === 0 ? 'invisible': ''} make-order" data-bs-toggle="modal" data-bs-target="#buyProduct">
         Make an order
@@ -46,7 +47,7 @@ export default class CartView {
         this.callbacks.delete(id);
       })
     });
-    makeOrderBtn.addEventListener('click', () => this.renderCustomerForm());
+    makeOrderBtn.addEventListener('click', this.callbacks.showCustomerForm);
   }
 
   renderCartProduct(product, index) {
@@ -62,28 +63,6 @@ export default class CartView {
         </td>
       </tr>
     `;
-  }
-
-  renderCustomerForm() {
-    this.dom.buyModal.firstElementChild.innerHTML = `
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Please, enter your personal data</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <form>
-            <label for="userName">Please, enter your name:</label>
-            <input type="text" class="form-control" name="user-name" id="userName" required pattern="/[a-zA-Z]{2,}/">
-            <label for="userPhone">Please, enter your phone number:</label>
-            <div class="input-group mb-3">
-              <span class="input-group-text">(...)-(...)-(..)-(..)</span>
-              <input type="tel" class="form-control" id="userPhone" name="user-phone" required pattern="[0-9]{3}-[0-9]{3}-[0-9]{2}-[0-9]{2}">
-            </div>            
-          </form>
-        </div>
-      </div>
-    `
   }
 
   renderOrderForm({ product_name, price, id, total_price, count }, addCallback) {

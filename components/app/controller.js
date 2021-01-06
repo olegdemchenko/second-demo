@@ -6,9 +6,12 @@ export default class StoreController {
     this.publisher = publisher;
     this.listeners = {
       showMainPage: () => this.publisher.notify('SHOW_CATEGORIES'),
+      buy: () => this.publisher.notify('RETRIEVE_CART_PRODUCTS'),
+      setCustomerData: (data) => this.model.setCustomerData(data),
     }
     this.model = new StoreModel();
     this.view = new StoreView(this.listeners);
+    this.publisher.subscribe('CART_PRODUCTS', this.buyProducts.bind(this));
     this.initApp();
   }
 
@@ -18,7 +21,12 @@ export default class StoreController {
     this.publisher.notify('LOAD_CATEGORIES', categories);
     this.publisher.notify('LOAD_GOODS', goods);
     this.publisher.notify('SHOW_CATEGORIES');
+    this.publisher.subscribe('SHOW_CUSTOMER_FORM', this.view.renderCustomerForm.bind(this.view));
     this.view.hideSpinner();
   }
 
+  buyProducts(products) {
+    const userData = this.model.getCustomerData();
+    this.model.sendMessageToOwner(JSON.stringify({ userData, products }));
+  }
 }

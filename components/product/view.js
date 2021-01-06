@@ -13,7 +13,7 @@ export default class ProductView {
     });
   }
 
-  renderProducts(products, page, lastPage) {
+  renderProducts(products) {
     if (products.length === 0) {
       this.dom.mainContainer.innerHTML = '<div class="p-4 fs-2">Sorry, but we don`t have any products, which match current requirements</div>';
       return;
@@ -35,6 +35,7 @@ export default class ProductView {
     }));
     infoButtons.forEach((btn) => btn.addEventListener('click', (e) => {
       const id = e.target.dataset.id;
+      console.log(id);
       this.callbacks.showInfo(id);
     }));
   }
@@ -70,10 +71,13 @@ export default class ProductView {
            ${this.renderTableRows(product)}
          </tbody>
        </table>
-       <a href="#" class="btn btn-primary mt-3 mx-auto product-buy" data-id="${product.id}" data-bs-toggle="modal" data-bs-target="#buyProduct">Add to cart</a>`
+       <div class="row justify-content-center"><a href="#" class="col-2 btn btn-primary mt-3 mx-auto product-buy" data-id="${product.id}" data-bs-toggle="modal" data-bs-target="#buyProduct">Add to cart</a></div>`
     );
     const btn = this.dom.mainContainer.querySelector('.product-buy');
-    btn.addEventListener('click', this.callbacks.choose);
+    btn.addEventListener('click', (e) => {
+      const id = e.target.dataset.id;
+      this.callbacks.choose(id);
+    });
   }
 
   renderTableRows(product) {

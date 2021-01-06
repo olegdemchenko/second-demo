@@ -1,13 +1,33 @@
 const categoriesUrl = 'https://spreadsheets.google.com/feeds/cells/1YAatDTdDVnsRAClCp3Iho3ERTjmX3FOgAPET4qXayfQ/1/public/full?alt=json';
-const goodsUrl = 'https://spreadsheets.google.com/feeds/cells/1PXorfz2O2NqH-FcW0nA-HhmtZMmSSwgHheifWc0e1tU/2/public/full?alt=json';
+const goodsUrl = 'https://spreadsheets.google.com/feeds/cells/1PXorfz2O2NqH-FcW0nA-HhmtZMmSSwgHheifWc0e1tU/3/public/full?alt=json';
+const botToken = '1506916734:AAEECIE4k2OTSjtUs3vEZMc6_Hpk6x1UUus';
+const chatId = '-444730083';
+const updatesUrl = 'https://api.telegram.org/bot1506916734:AAEECIE4k2OTSjtUs3vEZMc6_Hpk6x1UUus/getUpdates';
 
-const getData = (url, type) => fetch(url).then((r) => r[type]()).catch((e) => console.error(e));
+const getData = (url, type) => fetch(url).then((r) => {
+  if (r.ok) {
+    return r[type]();
+  }
+  throw new Error(`Error ${r.status}`);
+}).catch((e) => console.error(e));
 
 const retrieveData = (data) => (data?.feed?.entry) ?? []; 
 
 const propsCount = 9;
 
 export default class StoreModel {
+  constructor() {
+    this.customerData = {};
+  }
+
+  getCustomerData() {
+    return this.customerData;
+  }
+
+  setCustomerData(data) {
+    this.customerData = data;
+  }
+
   async loadCategories() {
     const shift = 11;
     const response = await getData(categoriesUrl, 'json');
@@ -39,5 +59,10 @@ export default class StoreModel {
         return acc;
       }, []);
     return goods;
+  }
+
+  async sendMessageToOwner(message) {
+    const url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&parse_mode=MarkdownV2&text=hello, Telegram`;
+    await getData(url, 'text');
   }
 }

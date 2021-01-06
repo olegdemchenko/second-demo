@@ -16,11 +16,16 @@ export default class ProductController {
     this.pagination = new PaginationController(this.view.renderProducts.bind(this.view));
     this.publisher.subscribe('LOAD_GOODS', this.setProducts.bind(this));
     this.publisher.subscribe('SHOW_CATEGORIES', this.model.cleanActions.bind(this.model));
-    this.publisher.subscribe('CHOOSE_CATEGORY', this.filterProducts.bind(this));
+    this.publisher.subscribe('CHOOSE_CATEGORY', this.showCategoryProducts.bind(this));
   }
 
   setProducts(products) {
     this.model.setProducts(products);
+  }
+
+  showCategoryProducts(categoryParams) {
+    this.model.cleanActions();
+    this.filterProducts(categoryParams);
   }
 
   filterProducts(params) {
@@ -46,6 +51,6 @@ export default class ProductController {
 
   chooseProduct(currId) {
     const { product_name, price, id } = this.model.getProduct(currId);
-    this.publisher.notify('CHOOSE_TO_ADD', { product_name, price, id });
+    this.publisher.notify('CHOOSE_TO_ADD', { product_name, price: Number(price), id });
   }
 }

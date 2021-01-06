@@ -9,6 +9,7 @@ export default class CartController {
       changeProdPrice: this.changeProdPrice.bind(this),
       selectProduct: this.prepareAddedInfo.bind(this, this.createMethodSequence([this.changeExistProd, this.showCart])),
       showCart: this.showCart.bind(this),
+      showCustomerForm: this.showCustomerForm.bind(this)
     }
     this.model = new CartModel();
     this.view = new CartView(this.listeners);
@@ -16,9 +17,18 @@ export default class CartController {
       'CHOOSE_TO_ADD',
       this.prepareNewInfo.bind(this, this.addNewProd.bind(this))
     );
+    this.publisher.subscribe('RETRIEVE_CART_PRODUCTS', this.retrieveProducts.bind(this));
   }
 
-  
+  retrieveProducts() {
+    const products = this.model.getAllProducts();
+    this.publisher.notify('CART_PRODUCTS', products);
+    this.model.setAllProducts([]);
+  }
+
+  showCustomerForm() {
+    this.publisher.notify('SHOW_CUSTOMER_FORM');
+  }  
 
   addNewProd() {
     const newProd = this.model.getProductOnChange();
@@ -62,8 +72,8 @@ export default class CartController {
       this.view.renderCountError(validError);
       return;
     }
-    const { price } = this.model.getProductOnChange();
-    const total_price = this.model.calculatePrice(price, count);
+    const currentProd = this.model.getProductOnChange();
+    const total_price = this.model.calculatePrice(currentProd.price, count);
     const changedProd = this.model.setUpParams(this.model.getProductOnChange(), { count, total_price });
     this.model.setProductOnChange(changedProd);
     this.view.renderOrderPrice(total_price);
@@ -71,6 +81,7 @@ export default class CartController {
 
   showCart() {
     const cartProducts = this.model.getAllProducts();
-    this.view.renderCart(cartProducts);
+    const totalPrice = this.model.getCartPrice();
+    this.view.renderCart(cartProducts, totalPrice);
   }
 }
