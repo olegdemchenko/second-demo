@@ -1,5 +1,5 @@
 const categoriesUrl = 'https://spreadsheets.google.com/feeds/cells/1YAatDTdDVnsRAClCp3Iho3ERTjmX3FOgAPET4qXayfQ/1/public/full?alt=json';
-const goodsUrl = 'https://spreadsheets.google.com/feeds/cells/1PXorfz2O2NqH-FcW0nA-HhmtZMmSSwgHheifWc0e1tU/3/public/full?alt=json';
+const goodsUrl = 'https://spreadsheets.google.com/feeds/cells/1PXorfz2O2NqH-FcW0nA-HhmtZMmSSwgHheifWc0e1tU/1/public/full?alt=json';
 const botToken = '1506916734:AAEECIE4k2OTSjtUs3vEZMc6_Hpk6x1UUus';
 const chatId = '-444730083';
 const updatesUrl = 'https://api.telegram.org/bot1506916734:AAEECIE4k2OTSjtUs3vEZMc6_Hpk6x1UUus/getUpdates';
