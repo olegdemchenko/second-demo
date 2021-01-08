@@ -32,7 +32,7 @@ export default class StoreView {
     }
     setTimeout(() => this.hideSpinner(), 200);
   }
-
+  /*
   renderCustomerForm() {
     this.dom.buyModal.firstElementChild.innerHTML = `
       <div class="modal-content">
@@ -68,5 +68,5 @@ export default class StoreView {
       this.callbacks.setCustomerData({ name, phone, email });
       this.callbacks.buy();
     });
-  }
+  }*/
 }

@@ -2,13 +2,13 @@ import PaginationModel from './model.js';
 import PaginationView from './view.js';
 
 export default class PaginationController {
-  constructor(renderElements) {
+  constructor(renderElements, containerSelector) {
     this.listeners = {
       show: this.showElements.bind(this),
       renderElements,
     }
     this.model = new PaginationModel();
-    this.view = new PaginationView(this.listeners);
+    this.view = new PaginationView(this.listeners, containerSelector);
   }
 
   setElements (elements) {

@@ -9,7 +9,9 @@ export default class CartController {
       changeProdPrice: this.changeProdPrice.bind(this),
       selectProduct: this.prepareAddedInfo.bind(this, this.createMethodSequence([this.changeExistProd, this.showCart])),
       showCart: this.showCart.bind(this),
-      showCustomerForm: this.showCustomerForm.bind(this)
+      showCustomerForm: this.showCustomerForm.bind(this),
+      showHistory: this.showHistory.bind(this),
+      buy: this.buyProducts.bind(this),
     }
     this.model = new CartModel();
     this.view = new CartView(this.listeners);
@@ -17,18 +19,27 @@ export default class CartController {
       'CHOOSE_TO_ADD',
       this.prepareNewInfo.bind(this, this.addNewProd.bind(this))
     );
-    this.publisher.subscribe('RETRIEVE_CART_PRODUCTS', this.retrieveProducts.bind(this));
   }
 
-  retrieveProducts() {
-    const products = this.model.getAllProducts();
-    this.publisher.notify('CART_PRODUCTS', products);
+  buyProducts(customerData) {
+    const customerProducts = this.model.getAllProducts();
+    const order = JSON.stringify({ customerData, customerProducts });
+    //this.publisher.notify('SEND_OWNER', order);
+    this.publisher.notify('PRODUCTS_SOLD', customerProducts.map(({ id, count }) => ({ id, count })));
+    this.model.addOrderToHistory(order);
     this.model.setAllProducts([]);
+    this.showCart();
+  }
+  
+  showCustomerForm() {
+    this.view.renderCustomerForm();
   }
 
-  showCustomerForm() {
-    this.publisher.notify('SHOW_CUSTOMER_FORM');
-  }  
+  showHistory() {
+    const history = this.model.getOrdersHistory();
+    console.log(history)
+    this.view.renderHistory(history);
+  }
 
   addNewProd() {
     const newProd = this.model.getProductOnChange();
@@ -66,8 +77,8 @@ export default class CartController {
     this.view.renderOrderForm(addedProd, callback);
   }
 
-  changeProdPrice(count) {
-    const validError = this.model.validateCount(count);
+  changeProdPrice(count, amount) {
+    const validError = this.model.validateCount(count, amount);
     if (validError) {
       this.view.renderCountError(validError);
       return;

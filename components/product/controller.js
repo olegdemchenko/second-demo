@@ -10,37 +10,53 @@ export default class ProductController {
       sort: this.sortProducts.bind(this),
       search: this.filterProducts.bind(this),
       choose: this.chooseProduct.bind(this),
+      deleteAction: this.deleteAction.bind(this),
     };
     this.view = new ProductView(this.listeners);
     this.model = new ProductModel();
-    this.pagination = new PaginationController(this.view.renderProducts.bind(this.view));
+    this.pagination = new PaginationController(this.view.renderProducts.bind(this.view), '.products-container');
     this.publisher.subscribe('LOAD_GOODS', this.setProducts.bind(this));
-    this.publisher.subscribe('SHOW_CATEGORIES', this.model.cleanActions.bind(this.model));
-    this.publisher.subscribe('CHOOSE_CATEGORY', this.showCategoryProducts.bind(this));
+    this.publisher.subscribe('SHOW_CATEGORIES', this.cleanActions.bind(this));
+    this.publisher.subscribe('CHOOSE_CATEGORY', this.filterProducts.bind(this));
+    this.publisher.subscribe('PRODUCTS_SOLD', this.changeProductsAmount.bind(this));
+    this.model.addAction(this.model.filterProducts.bind(this.model), { params: { type: 'filter', value: 'availbable' }, predicate: 'AVAILABLE' });
+  }
+
+  changeProductsAmount(products) {
+    this.model.changeProductsAmount(products);
   }
 
   setProducts(products) {
     this.model.setProducts(products);
   }
 
-  showCategoryProducts(categoryParams) {
-    this.model.cleanActions();
-    this.filterProducts(categoryParams);
+  cleanActions() {
+    this.model.setActions([]);
+    this.model.addAction(this.model.filterProducts.bind(this.model), { params: { type: 'filter', value: 'availbable' }, predicate: 'AVAILABLE' });
+  }
+  
+  deleteAction(e) {
+    const id = Number(e.target.dataset.actionId);
+    this.model.deleteAction(id);
+    this.showProducts();
   }
 
   filterProducts(params) {
-    this.model.addActions([this.model.filterProducts, [params]]);
+    this.model.addAction(this.model.filterProducts.bind(this.model), { params: { type: 'filter', ...params }, predicate:'MATCH' });
     this.showProducts();
   }
 
   showProducts() {
     const currentProducts = this.model.getCurrentProducts();
+    const actions = this.model.getActions();
     this.pagination.setElements(currentProducts);
+    this.view.cleanMain()
+    this.view.renderActionTags(actions);
     this.pagination.showElements();
   }
 
   sortProducts(sortParam) {
-    this.model.addActions([this.model.sortProducts, [sortParam]]);
+    this.model.addAction(this.model.sortProducts, { params: { type: 'sort', property: sortParam } });
     this.showProducts();
   }
 
@@ -50,7 +66,7 @@ export default class ProductController {
   }
 
   chooseProduct(currId) {
-    const { product_name, price, id } = this.model.getProduct(currId);
-    this.publisher.notify('CHOOSE_TO_ADD', { product_name, price: Number(price), id });
+    const { product_name, price, id, amount } = this.model.getProduct(currId);
+    this.publisher.notify('CHOOSE_TO_ADD', { product_name, price, id, amount });
   }
 }

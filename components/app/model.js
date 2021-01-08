@@ -2,7 +2,7 @@ const categoriesUrl = 'https://spreadsheets.google.com/feeds/cells/1YAatDTdDVnsR
 const goodsUrl = 'https://spreadsheets.google.com/feeds/cells/1PXorfz2O2NqH-FcW0nA-HhmtZMmSSwgHheifWc0e1tU/1/public/full?alt=json';
 const botToken = '1506916734:AAEECIE4k2OTSjtUs3vEZMc6_Hpk6x1UUus';
 const chatId = '-444730083';
-const updatesUrl = 'https://api.telegram.org/bot1506916734:AAEECIE4k2OTSjtUs3vEZMc6_Hpk6x1UUus/getUpdates';
+//const updatesUrl = 'https://api.telegram.org/bot1506916734:AAEECIE4k2OTSjtUs3vEZMc6_Hpk6x1UUus/getUpdates';
 
 const getData = (url, type) => fetch(url).then((r) => {
   if (r.ok) {
@@ -16,17 +16,6 @@ const retrieveData = (data) => (data?.feed?.entry) ?? [];
 const propsCount = 9;
 
 export default class StoreModel {
-  constructor() {
-    this.customerData = {};
-  }
-
-  getCustomerData() {
-    return this.customerData;
-  }
-
-  setCustomerData(data) {
-    this.customerData = data;
-  }
 
   async loadCategories() {
     const shift = 11;
@@ -57,12 +46,15 @@ export default class StoreModel {
           return [...acc, good];
         }
         return acc;
-      }, []);
+      }, [])
+      .map((prod) => {
+        return { ...prod, amount: Number(prod.amount), price: Number(prod.price) };
+      });
     return goods;
   }
 
   async sendMessageToOwner(message) {
-    const url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&parse_mode=MarkdownV2&text=hello, Telegram`;
+    const url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${message}`;
     await getData(url, 'text');
   }
 }

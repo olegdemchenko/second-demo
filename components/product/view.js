@@ -13,31 +13,63 @@ export default class ProductView {
     });
   }
 
+  cleanMain() {
+    this.dom.mainContainer.innerHTML = '';
+  }
+
   renderProducts(products) {
+    let productsContainer = this.dom.mainContainer.querySelector('.products-container');
+    if (!productsContainer) {
+      const container = document.createElement('div');
+      container.classList.add('row', 'g-4', 'mt-1', 'products-container');
+      this.dom.mainContainer.append(container);
+      productsContainer = container;
+    }
     if (products.length === 0) {
-      this.dom.mainContainer.innerHTML = '<div class="p-4 fs-2">Sorry, but we don`t have any products, which match current requirements</div>';
+      productsContainer.innerHTML = '<div class="p-4 fs-2">Sorry, but we don`t have any products, which match current requirements</div>';
       return;
     }
-    this.dom.mainContainer.innerHTML = 
+    productsContainer.innerHTML = 
     `<div class="row justify-content-center p-3"><a href="#" class="col-2 d-block btn btn-primary" data-sort="price">Sort by price</a></div>
      ${products.map(this.renderProductCard).join('')}
     `;
-    const sortButton = document.querySelector('a[data-sort]');
+    const sortButton = productsContainer.querySelector('a[data-sort]');
     sortButton.addEventListener('click', (e) => {
       const sortParam = e.target.dataset.sort;
       this.callbacks.sort(sortParam);
     });
-    const infoButtons = [...document.querySelectorAll('.product-info')];
-    const buyButtons = [...document.querySelectorAll('.product-buy')];
+    const infoButtons = [...productsContainer.querySelectorAll('.product-info')];
+    const buyButtons = [...productsContainer.querySelectorAll('.product-buy')];
     buyButtons.forEach((btn) => btn.addEventListener('click', (e) => {
       const currId = e.target.dataset.id;
       this.callbacks.choose(currId);
     }));
     infoButtons.forEach((btn) => btn.addEventListener('click', (e) => {
       const id = e.target.dataset.id;
-      console.log(id);
+    //  console.log(id);
       this.callbacks.showInfo(id);
     }));
+  }
+
+  renderActionTags(actions) {
+    this.dom.mainContainer.insertAdjacentHTML('afterbegin',
+     `<div>
+       ${actions.map((action) => this.renderAction(action)).join('')}
+      </div>
+     `);
+    const deleteBtns = [...this.dom.mainContainer.querySelectorAll('.delete-action')];
+    deleteBtns.forEach((btn) => {
+      btn.addEventListener('click', this.callbacks.deleteAction);
+    });
+  }
+
+  renderAction({ id, params: { params } }) {
+    return `
+      <div class="d-inline-block bg-primary rounded-3 text-light p-3 mt-e ms-3 ">
+        <strong class="align-top">${Object.values(params).join(',  ')}</strong>
+        <button type="button" class="btn-close ms-2 delete-action" data-action-id="${id}"></button>
+      </div>
+    `;
   }
 
   renderProductCard(product) {

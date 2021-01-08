@@ -1,14 +1,13 @@
 export default class PaginationView {
-  constructor(callbacks) {
+  constructor(callbacks, selector) {
     this.callbacks = callbacks;
-    this.dom = {
-      mainContainer: document.querySelector('.main-container'),
-    }
+    this.containerSelector = selector;
   }
 
   render(elements, page, lastPage) {
     this.callbacks.renderElements(elements);
-    this.dom.mainContainer.insertAdjacentHTML('beforeend', this.renderPagination(page, lastPage));
+    const container = document.querySelector(this.containerSelector);
+    container.insertAdjacentHTML('beforeend', this.renderPagination(page, lastPage));
     const pageButtons = [...document.querySelectorAll('li[data-page-numb]')];
     pageButtons.forEach((btn) => btn.addEventListener('click', (e) => {
       const pageNumb = Number(e.currentTarget.dataset.pageNumb);
@@ -17,7 +16,7 @@ export default class PaginationView {
   }
 
   renderPagination(pageNumb, lastPage) {
-    if (pageNumb === 1 && lastPage === 1) {
+    if (pageNumb === 1 && lastPage <= 1) {
       return '';
     }
     const pages = this.renderPaginationLinks(pageNumb, lastPage);

@@ -3,13 +3,23 @@ export default class CartModel {
     this.products = [];
     this.productOnChange = null;
   }
-
+  
   getProductOnChange() {
     return this.productOnChange;
   }
 
   setProductOnChange(prod) {
     this.productOnChange = prod;
+  }
+
+  addOrderToHistory(order) {
+    const date = new Date();
+    localStorage.setItem(date, order);
+  }
+
+  getOrdersHistory() {
+    const orders = Object.entries(localStorage);
+    return orders.map(([date, orderInfo]) => [date, JSON.parse(orderInfo)]);
   }
 
   hasProduct(id) {
@@ -43,9 +53,9 @@ export default class CartModel {
     return this.getAllProducts().find(({ id }) => id === prodId);
   }
 
-  validateCount(count) {
-    const parsedCount = Number.parseInt(count);
-    return Number.isFinite(parsedCount) && parsedCount > 0 ? null : 'Please, use only natural numbers';
+  validateCount(count, amount) {
+    const isValid = Number.isFinite(count) && count > 0 && count <= amount;
+    return isValid ? null : 'Please, use only natural numbers, which less than amount of product';
   }
 
   getCartPrice() {
