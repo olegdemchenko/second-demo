@@ -1,12 +1,21 @@
 export default class CartView {
   constructor(callbacks) {
+    this.init();
     this.dom = {
       mainContent: document.querySelector('.main-container'),
-      buyModal: document.getElementById('buyProduct'),
+      modal: document.getElementById('mainModal'),
       openCart: document.querySelector('.open-cart'),
     };
     this.callbacks = callbacks;
     this.dom.openCart.addEventListener('click', this.callbacks.showCart); 
+  }
+
+  init() {
+    const navbarContainer = document.querySelector('.navbar-nav');
+    navbarContainer.insertAdjacentHTML('beforeend', 
+    `<li class="nav-item me-4">
+       <a class="nav-link open-cart" href="#">Cart</a>
+     </li>`);
   }
 
   renderCart(products, totalPrice) {
@@ -28,7 +37,7 @@ export default class CartView {
     </table>
     <div class="text-center fs-2">Total price: ${totalPrice}</div>
     <div class="row justify-content-center">
-      <button type="button" class="col-2 btn btn-success ${products.length === 0 ? 'invisible': ''} make-order" data-bs-toggle="modal" data-bs-target="#buyProduct">
+      <button type="button" class="col-2 btn btn-success ${products.length === 0 ? 'invisible': ''} make-order" data-bs-toggle="modal" data-bs-target="#mainModal">
         Make an order
       </button>
     </div>
@@ -61,7 +70,7 @@ export default class CartView {
         <td>${product.count}</td>
         <td>${product.total_price}</td>
         <td>
-          <button class="btn btn-primary change-btn" data-id="${product.id}" data-bs-toggle="modal" data-bs-target="#buyProduct">Change count</button>
+          <button class="btn btn-primary change-btn" data-id="${product.id}" data-bs-toggle="modal" data-bs-target="#mainModal">Change count</button>
           <button class="btn btn-danger delete-btn" data-id="${product.id}">Delete product</button>
         </td>
       </tr>
@@ -69,7 +78,7 @@ export default class CartView {
   }
 
   renderOrderForm({ product_name, price, id, total_price, count, amount }, addCallback) {
-    this.dom.buyModal.firstElementChild.innerHTML = `
+    this.dom.modal.firstElementChild.innerHTML = `
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Please, select a count of product</h5>
@@ -106,8 +115,8 @@ export default class CartView {
         <button type="button" class="btn btn-primary add-btn" data-bs-dismiss="modal">Add</button>
       </div>
     </div> `;
-    const countInput = this.dom.buyModal.querySelector('input[name="product-count"]');
-    const addBtn = this.dom.buyModal.querySelector('.add-btn');
+    const countInput = this.dom.modal.querySelector('input[name="product-count"]');
+    const addBtn = this.dom.modal.querySelector('.add-btn');
     countInput.addEventListener('input', (e) => {
       const count = Number(e.target.value);
       this.callbacks.changeProdPrice(count, amount);
@@ -190,7 +199,7 @@ export default class CartView {
   }
 
   renderCustomerForm() {
-    this.dom.buyModal.firstElementChild.innerHTML = `
+    this.dom.modal.firstElementChild.innerHTML = `
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">Please, enter your personal data</h5>
@@ -225,22 +234,56 @@ export default class CartView {
     });
   }
 
+  renderPurchaseSuccess() {
+    this.dom.modal.firstElementChild.innerHTML = `
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title text-center text-success">Congratulations</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="text-center text-success">You have made succesfully purchase! Thanks for choosing our store</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+    `;
+  }
+
+  renderPurchaseError() {
+    this.dom.modal.firstElementChild.innerHTML = `
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title text-center text-danger">Sorry, an error occured!</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p class="text-center text-danger">Please, try to make your purchase a bit later.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+    `;
+  }
+
   renderOrderPrice(price) {
-    const errField = this.dom.buyModal.querySelector('.error-message');
+    const errField = this.dom.modal.querySelector('.error-message');
     errField.hidden = true;
-    const countInput = this.dom.buyModal.querySelector('#productCount');
+    const countInput = this.dom.modal.querySelector('#productCount');
     countInput.classList.remove('is-invalid');
     const priceField = document.querySelector('.order-total-price');
     priceField.textContent = price;
   }
 
   renderCountError(err) {
-    const countInput = this.dom.buyModal.querySelector('#productCount');
+    const countInput = this.dom.modal.querySelector('#productCount');
     countInput.classList.add('is-invalid');
-    const errField = this.dom.buyModal.querySelector('.error-message');
+    const errField = this.dom.modal.querySelector('.error-message');
     errField.textContent = err;
     errField.hidden = false;
-    const totalPrice = this.dom.buyModal.querySelector('.order-total-price');
+    const totalPrice = this.dom.modal.querySelector('.order-total-price');
     totalPrice.textContent = '';
   }
 }

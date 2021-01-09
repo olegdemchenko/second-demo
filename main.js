@@ -4,7 +4,7 @@ import ProductController from './components/product/controller.js';
 import CartController from './components/cart/controller.js';
 import Publisher from './components/publisher.js';
 
-const storePublisher = new Publisher();
+const storePublisher = Publisher.getInstance();
 new ProductController(storePublisher);
 new CategoryController(storePublisher);
 new CartController(storePublisher);

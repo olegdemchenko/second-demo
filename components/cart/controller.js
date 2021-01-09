@@ -17,18 +17,23 @@ export default class CartController {
     this.view = new CartView(this.listeners);
     this.publisher.subscribe(
       'CHOOSE_TO_ADD',
-      this.prepareNewInfo.bind(this, this.addNewProd.bind(this))
+      this.prepareInfo.bind(this, this.changeExistProd.bind(this)),
     );
   }
 
   buyProducts(customerData) {
     const customerProducts = this.model.getAllProducts();
     const order = JSON.stringify({ customerData, customerProducts });
-    //this.publisher.notify('SEND_OWNER', order);
-    this.publisher.notify('PRODUCTS_SOLD', customerProducts.map(({ id, count }) => ({ id, count })));
-    this.model.addOrderToHistory(order);
-    this.model.setAllProducts([]);
-    this.showCart();
+    try {
+     //this.publisher.notify('SEND_OWNER', order);
+      this.publisher.notify('PRODUCTS_SOLD', customerProducts.map(({ id, count }) => ({ id, count })));
+      this.model.addOrderToHistory(order);
+      this.model.setAllProducts([]);
+      this.view.renderPurchaseSuccess();
+      this.showCart();
+    } catch(e) {
+      this.view.renderPurchaseError();
+    }
   }
   
   showCustomerForm() {
@@ -37,7 +42,6 @@ export default class CartController {
 
   showHistory() {
     const history = this.model.getOrdersHistory();
-    console.log(history)
     this.view.renderHistory(history);
   }
 
@@ -65,10 +69,19 @@ export default class CartController {
     return invoker.bind(this);
   }
 
-  prepareNewInfo(callback, newProduct) {
+  prepareInfo(callback, productInfo) {
+    const alreadyAdded = this.model.hasProduct(productInfo.id);
+    if (alreadyAdded) {
+      this.prepareAddedInfo(callback, productInfo.id);
+      return;
+    }
+    this.prepareNewInfo(productInfo);
+  } 
+
+  prepareNewInfo(newProduct) {
     const normalProd = this.model.setUpParams(newProduct, { total_price: newProduct.price, count: 1 });
     this.model.setProductOnChange(normalProd);
-    this.view.renderOrderForm(normalProd, callback);
+    this.view.renderOrderForm(normalProd, this.addNewProd.bind(this));
   }
 
   prepareAddedInfo(callback, id) {
@@ -91,6 +104,7 @@ export default class CartController {
   }
 
   showCart() {
+    this.publisher.notify('SHOW_CART');
     const cartProducts = this.model.getAllProducts();
     const totalPrice = this.model.getCartPrice();
     this.view.renderCart(cartProducts, totalPrice);

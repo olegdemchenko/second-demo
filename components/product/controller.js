@@ -7,6 +7,7 @@ export default class ProductController {
     this.publisher = publisher;
     this.listeners = {
       showInfo: this.showProductInfo.bind(this),
+      showProducts: this.showProducts.bind(this),
       sort: this.sortProducts.bind(this),
       search: this.filterProducts.bind(this),
       choose: this.chooseProduct.bind(this),
@@ -19,6 +20,7 @@ export default class ProductController {
     this.publisher.subscribe('SHOW_CATEGORIES', this.cleanActions.bind(this));
     this.publisher.subscribe('CHOOSE_CATEGORY', this.filterProducts.bind(this));
     this.publisher.subscribe('PRODUCTS_SOLD', this.changeProductsAmount.bind(this));
+    this.publisher.subscribe('SHOW_CART', this.cleanActions.bind(this));
     this.model.addAction(this.model.filterProducts.bind(this.model), { params: { type: 'filter', value: 'availbable' }, predicate: 'AVAILABLE' });
   }
 
@@ -47,6 +49,7 @@ export default class ProductController {
   }
 
   showProducts() {
+    console.log('show')
     const currentProducts = this.model.getCurrentProducts();
     const actions = this.model.getActions();
     this.pagination.setElements(currentProducts);

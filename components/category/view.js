@@ -1,10 +1,28 @@
 export default class CategoryView {
   constructor(callbacks) {
+    this.init();
     this.dom = {
       dropdown: document.querySelector('.dropdown-menu'),
       mainContainer: document.querySelector('.main-container'),
     };
     this.callbacks = callbacks;
+  }
+
+  init() {
+    const navbarContainer = document.querySelector('.navbar-nav');
+    navbarContainer.insertAdjacentHTML('beforeend', 
+    `<li class="nav-item dropdown me-4">
+       <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+         Categories
+       </a>
+       <ul class="dropdown-menu" aria-labelledby="navbarDropdown"></ul>
+     </li>
+     <li class="nav-item me-4">
+       <a class="nav-link" aria-current="page" href="#" data-category="S">Top</a>
+     </li>
+     <li class="nav-item me-4">
+       <a class="nav-link" href="#" data-category="B">Discount</a>
+     </li>`); 
   }
 
   render(categories) {

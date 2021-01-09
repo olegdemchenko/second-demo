@@ -54,7 +54,7 @@ export default class CartModel {
   }
 
   validateCount(count, amount) {
-    const isValid = Number.isFinite(count) && count > 0 && count <= amount;
+    const isValid = Number.isFinite(count) && count > 0 && Math.round(count) === count && count <= amount;
     return isValid ? null : 'Please, use only natural numbers, which less than amount of product';
   }
 

@@ -3,6 +3,13 @@ export default class Publisher {
     this.listeners = {};
   }
 
+  static getInstance() {
+    if(!Publisher.instance) {
+      Publisher.instance = new Publisher;
+    }
+    return Publisher.instance;
+  }
+
   subscribe(event, listener) {
     if (!this.listeners[event]) {
       this.listeners[event] = [];
@@ -15,4 +22,6 @@ export default class Publisher {
       this.listeners[event].forEach((listener) => listener(data));
     }
   }
+
+
 }

@@ -1,5 +1,6 @@
 export default class ProductView {
   constructor(callbacks) {
+    this.init();
     this.dom = {
       mainContainer: document.querySelector('.main-container'),
       searchForm: document.querySelector('.search-form'),
@@ -11,6 +12,20 @@ export default class ProductView {
       const value = e.target.elements['search-value'].value;
       this.callbacks.search({ property, value });
     });
+  }
+
+  init() {
+    const navbarContainer = document.querySelector('.navbar-nav');
+    navbarContainer.insertAdjacentHTML('afterend', 
+    `<form class="d-flex search-form">
+       <input class="form-control me-3" name="search-value" type="search" placeholder="Search" aria-label="Search">
+       <select class="form-select me-3" name="search-type" > 
+         <option value="product_name" selected>Name</option>
+         <option value="manufacture">Manufacturer</option>
+         <option value="id">id</option>
+       </select>
+       <button class="btn btn-outline-success" type="submit">Search</button>
+     </form>`);
   }
 
   cleanMain() {
@@ -81,7 +96,7 @@ export default class ProductView {
              <h5 class="card-title">${product.product_name}</h5>
              <p class="card-text">Price: ${product.price}</p>
              <p class="card-text">Units: ${product.units}</p>
-             <a href="#" class="btn btn-primary product-buy" data-id="${product.id}" data-bs-toggle="modal" data-bs-target="#buyProduct">Add to cart</a>
+             <a href="#" class="btn btn-primary product-buy" data-id="${product.id}" data-bs-toggle="modal" data-bs-target="#mainModal">Add to cart</a>
              <a href="#" class="btn btn-primary product-info" data-id="${product.id}">More info</a>
            </div>
          </div>
@@ -103,13 +118,18 @@ export default class ProductView {
            ${this.renderTableRows(product)}
          </tbody>
        </table>
-       <div class="row justify-content-center"><a href="#" class="col-2 btn btn-primary mt-3 mx-auto product-buy" data-id="${product.id}" data-bs-toggle="modal" data-bs-target="#buyProduct">Add to cart</a></div>`
+       <div class="row justify-content-center">
+         <a href="#" class="col-2 btn btn-primary mt-3 mx-auto product-buy" data-id="${product.id}" data-bs-toggle="modal" data-bs-target="#mainModal">Add to cart</a>
+         <a href="#" class="col-2 btn btn-primary mt-3 mx-auto back-to-products">Back</a>
+         </div>`
     );
-    const btn = this.dom.mainContainer.querySelector('.product-buy');
-    btn.addEventListener('click', (e) => {
+    const buyBtn = this.dom.mainContainer.querySelector('.product-buy');
+    const backBtn = this.dom.mainContainer.querySelector('.back-to-products');
+    buyBtn.addEventListener('click', (e) => {
       const id = e.target.dataset.id;
       this.callbacks.choose(id);
     });
+    backBtn.addEventListener('click', this.callbacks.showProducts);
   }
 
   renderTableRows(product) {
