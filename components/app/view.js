@@ -4,18 +4,17 @@ export default class StoreView {
     this.callbacks = callbacks;
     this.isSpinnerShown = false;
     this.dom = {
-      modalSpinner: document.getElementById('spinner'),
+    //  modalSpinner: document.getElementById('spinner'),
       brand: document.querySelector('.store-brand'),
-      buyModal: document.querySelector('#buyProduct'),
     }
     this.dom.brand.addEventListener('click', this.callbacks.showMainPage);
-    this.dom.modalSpinner.addEventListener('shown.bs.modal', () => {
+   /* this.dom.modalSpinner.addEventListener('shown.bs.modal', () => {
       this.isSpinnerShown = true;
     });
     this.dom.modalSpinner.addEventListener('hidden.bs.modal', () => {
       this.isSpinnerShown = false;
     });
-    this.spinner = new bootstrap.Modal(this.dom.modalSpinner, { backdrop: 'static' });
+    this.spinner = new bootstrap.Modal(this.dom.modalSpinner, { backdrop: 'static' });*/
   }
   
   init() {
@@ -26,7 +25,7 @@ export default class StoreView {
       </a>`);
     
   }
-
+  /*
   showSpinner() {
     if (!this.isSpinnerShown) {
       this.spinner.show();
@@ -41,6 +40,6 @@ export default class StoreView {
       return;
     }
     setTimeout(() => this.hideSpinner(), 200);
-  }
+  }*/
   
 }

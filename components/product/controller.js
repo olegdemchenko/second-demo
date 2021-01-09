@@ -5,6 +5,7 @@ import PaginationController from '../pagination/controller.js';
 export default class ProductController {
   constructor(publisher) {
     this.publisher = publisher;
+    this.publisher.notify('SHOW_PRELOADER');
     this.listeners = {
       showInfo: this.showProductInfo.bind(this),
       showProducts: this.showProducts.bind(this),
@@ -49,7 +50,6 @@ export default class ProductController {
   }
 
   showProducts() {
-    console.log('show')
     const currentProducts = this.model.getCurrentProducts();
     const actions = this.model.getActions();
     this.pagination.setElements(currentProducts);

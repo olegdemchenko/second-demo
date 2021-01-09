@@ -14,12 +14,12 @@ export default class StoreController {
   }
 
   async initApp() {
-    this.view.showSpinner();
+   // this.view.showSpinner();
     const [categories, goods] = await Promise.all([this.model.loadCategories(), this.model.loadGoods()]);
     this.publisher.notify('LOAD_CATEGORIES', categories);
     this.publisher.notify('LOAD_GOODS', goods);
     this.publisher.notify('SHOW_CATEGORIES');
-    this.view.hideSpinner();
+    this.publisher.notify('HIDE_PRELOADER');
   }
   
   sendToOwner(message) {
