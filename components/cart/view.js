@@ -3,7 +3,7 @@ export default class CartView {
     this.init();
     this.dom = {
       mainContent: document.querySelector('.main-container'),
-      modal: document.getElementById('mainModal'),
+      modal: document.querySelector('#mainModal'),
       openCart: document.querySelector('.open-cart'),
     };
     this.callbacks = callbacks;
@@ -76,128 +76,7 @@ export default class CartView {
       </tr>
     `;
   }
-
-  renderOrderForm({ product_name, price, id, total_price, count, amount }, addCallback) {
-    this.dom.modal.firstElementChild.innerHTML = `
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Please, select a count of product</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <form>
-            <div class="mb-3">
-              <label for="disabledId" class="form-label">Product id</label>
-              <input type="number" id="disabledId" name="product-id" value="${id}" class="form-control order-product-id" readonly>
-            </div>
-            <div class="mb-3">
-              <label for="disabledName" class="form-label">Product name</label>
-              <input type="text" id="disabledName" name="product-name" value="${product_name}" class="form-control order-product-name" readonly>
-            </div>
-            <div class="mb-3">
-              <label for="disabledPrice" class="form-label">Product price</label>
-              <input type="text" id="disabledPrice" name="product-price" value="${price}" class="form-control order-product-price" readonly>
-            </div>
-            <div class="mb-3">
-              <label for="disabledAmount" class="form-label">Amount</label>
-              <input type="text" id="disabledName" name="product-price" value="${amount}" class="form-control order-product-amount" readonly>
-            </div>
-          <div class="mb-3">
-            <label for="productCount">Count of product</label>
-            <input type="number" class="form-control" name="product-count" id="productCount" value="${count ?? 1}" min="0"> 
-            <span class="text-danger error-message"></span>  
-          </div>
-          <p class="fs-2">Total price: <span class="order-total-price">${total_price ?? price}</span></p>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary add-btn" data-bs-dismiss="modal">Add</button>
-      </div>
-    </div> `;
-    const countInput = this.dom.modal.querySelector('input[name="product-count"]');
-    const addBtn = this.dom.modal.querySelector('.add-btn');
-    countInput.addEventListener('input', (e) => {
-      const count = Number(e.target.value);
-      this.callbacks.changeProdPrice(count, amount);
-    });
-    addBtn.addEventListener('click', () => {
-      addCallback();
-    });
-  }
-
-  renderHistory(history) {
-    this.dom.mainContent.innerHTML = `
-    <div class="d-flex justify-content-center"><button class="btn btn-primary back-to-cart">Back</button></div>
-    <div class="accordion" id="ordersHistory">
-      ${history.map((order, index) => this.renderHistoryOrder(order, index)).join('')}
-    </div>
-    `;
-    const backBtn = this.dom.mainContent.querySelector('.back-to-cart');
-    backBtn.addEventListener('click', this.callbacks.showCart);
-  }
-
-  renderHistoryOrder([date, { customerData, customerProducts }], index) {
-    return `
-    <div class="accordion-item">
-      <h2 class="accordion-header" id="heading${index}">
-        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#orderInfo${index}" aria-expanded="true" aria-controls="collapseOne">
-          ${date}
-        </button>
-      </h2>
-      <div id="orderInfo${index}" class="accordion-collapse collapse" aria-labelledby="heading${index}" data-bs-parent="#ordersHistory">
-        <div class="accordion-body">
-          <h2>Customer information</h2>
-          <table class="table">
-            <thead>
-              <tr>
-                <th scope="col">Name</th>
-                <th scope="col">Phone</th>
-                <th scope="col">Email</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>${customerData.name}</td>
-                <td>${customerData.phone}</td>
-                <td>${customerData.email}</td>
-              </tr>
-            </tbody>
-          </table>
-          <h2>Products info</h2>
-          <table class="table">
-            <thead>
-              <tr>
-                <th scope="col">Product name</th>
-                <th scope="col">Id</th>
-                <th scope="col">Amount</th>
-                <th scope="col">Count</th>
-                <th scope="col">Price</th>
-                <th scope="col">Total price</th>
-              </tr>
-            </thead>
-            <tbody>
-            ${customerProducts.map((prod) => this.renderHistoryProduct(prod)).join('')}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-    `;
-  }
-
-  renderHistoryProduct(product) {
-    return `
-    <tr>
-      <td>${product['product_name']}</td>
-      <td>${product.id}</td>
-      <td>${product.amount}</td>
-      <td>${product.count}</td>
-      <td>${product.price}</td>
-      <td>${product['total_price']}</td>
-    </tr>`
-  }
-
+  /*
   renderCustomerForm() {
     this.dom.modal.firstElementChild.innerHTML = `
       <div class="modal-content">
@@ -266,24 +145,6 @@ export default class CartView {
       </div>
     </div>
     `;
-  }
-
-  renderOrderPrice(price) {
-    const errField = this.dom.modal.querySelector('.error-message');
-    errField.hidden = true;
-    const countInput = this.dom.modal.querySelector('#productCount');
-    countInput.classList.remove('is-invalid');
-    const priceField = document.querySelector('.order-total-price');
-    priceField.textContent = price;
-  }
-
-  renderCountError(err) {
-    const countInput = this.dom.modal.querySelector('#productCount');
-    countInput.classList.add('is-invalid');
-    const errField = this.dom.modal.querySelector('.error-message');
-    errField.textContent = err;
-    errField.hidden = false;
-    const totalPrice = this.dom.modal.querySelector('.order-total-price');
-    totalPrice.textContent = '';
-  }
+  }*/
+  
 }

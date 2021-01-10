@@ -9,8 +9,8 @@ export default class PreloaderController {
     }
     this.model = new PreloaderModel()
     this.view = new PreloaderView(this.listeners);
-    this.publisher.subscribe('SHOW_PRELOADER', this.showPreloader.bind(this));
-    this.publisher.subscribe('HIDE_PRELOADER', this.hidePrealoder.bind(this));
+    //this.publisher.subscribe('SHOW_PRELOADER', this.showPreloader.bind(this));
+    //this.publisher.subscribe('HIDE_PRELOADER', this.hidePrealoder.bind(this));
   }
 
   showPreloader() {

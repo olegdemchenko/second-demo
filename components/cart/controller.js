@@ -6,8 +6,7 @@ export default class CartController {
     this.publisher = publisher;
     this.listeners = {
       delete: this.deleteFromCart.bind(this),
-      changeProdPrice: this.changeProdPrice.bind(this),
-      selectProduct: this.prepareAddedInfo.bind(this, this.createMethodSequence([this.changeExistProd, this.showCart])),
+      selectProduct: this.prepareAddedProduct.bind(this, ['SHOW_CART']),
       showCart: this.showCart.bind(this),
       showCustomerForm: this.showCustomerForm.bind(this),
       showHistory: this.showHistory.bind(this),
@@ -17,8 +16,11 @@ export default class CartController {
     this.view = new CartView(this.listeners);
     this.publisher.subscribe(
       'CHOOSE_TO_ADD',
-      this.prepareInfo.bind(this, this.changeExistProd.bind(this)),
+      this.prepareProduct.bind(this),
     );
+    this.publisher.subscribe('SHOW_CART', this.showCart.bind(this));
+    this.publisher.subscribe('SEND_TEMPORARY_PRODUCT', this.addProduct.bind(this));
+    this.publisher.subscribe('CUSTOMER_DATA', this.buyProducts.bind(this));
   }
 
   buyProducts(customerData) {
@@ -27,84 +29,62 @@ export default class CartController {
     try {
      //this.publisher.notify('SEND_OWNER', order);
       this.publisher.notify('PRODUCTS_SOLD', customerProducts.map(({ id, count }) => ({ id, count })));
-      this.model.addOrderToHistory(order);
+      this.publisher.notify('ADD_ORDER_TO_HISTORY', order);
       this.model.setAllProducts([]);
-      this.view.renderPurchaseSuccess();
       this.showCart();
+      this.publisher.notify('PURCHASE_SUCCESS');
     } catch(e) {
-      this.view.renderPurchaseError();
+      this.publisher.notify('PURCHASE_FAIL', e.message);
     }
   }
   
   showCustomerForm() {
-    this.view.renderCustomerForm();
+    this.publisher.notify('SHOW_CUSTOMER_FORM');
   }
 
   showHistory() {
-    const history = this.model.getOrdersHistory();
-    this.view.renderHistory(history);
+    this.publisher.notify('SHOW_HISTORY');
   }
-
-  addNewProd() {
-    const newProd = this.model.getProductOnChange();
-    this.model.addProduct(newProd);
+  
+  addProduct(prod) {
+    const isExist = this.model.hasProduct(prod.id);
+    if (isExist) {
+      this.model.changeExistedProduct(prod);
+      return;
+    }
+    this.model.addProduct(prod);
   }
-
-  changeExistProd() {
-    const changedProd = this.model.getProductOnChange();
-    this.model.changeExistedProduct(changedProd);
-  }
-
+  
   deleteFromCart(id) {
     this.model.deleteProduct(id);
     this.showCart();
   }
-
-  createMethodSequence(methods) {
-    const invoker = function(args) {
-      methods.forEach((method) => {
-        method.call(this, args);
-      }); 
-    }
-    return invoker.bind(this);
-  }
-
-  prepareInfo(callback, productInfo) {
+ 
+  prepareProduct(productInfo) {
     const alreadyAdded = this.model.hasProduct(productInfo.id);
     if (alreadyAdded) {
-      this.prepareAddedInfo(callback, productInfo.id);
+      this.prepareAddedProduct([], productInfo.id);
       return;
     }
-    this.prepareNewInfo(productInfo);
+    this.prepareNewProduct(productInfo);
   } 
-
-  prepareNewInfo(newProduct) {
+  
+  prepareNewProduct(newProduct) {
     const normalProd = this.model.setUpParams(newProduct, { total_price: newProduct.price, count: 1 });
-    this.model.setProductOnChange(normalProd);
-    this.view.renderOrderForm(normalProd, this.addNewProd.bind(this));
+    this.publisher.notify('SET_TEMPORARY_PRODUCT', normalProd);
+    this.publisher.notify('SHOW_TEMPORARY_PRODUCT');
+   
   }
 
-  prepareAddedInfo(callback, id) {
+  prepareAddedProduct(events, id) {
     const addedProd = this.model.getProduct(id);
-    this.model.setProductOnChange(addedProd);
-    this.view.renderOrderForm(addedProd, callback);
-  }
-
-  changeProdPrice(count, amount) {
-    const validError = this.model.validateCount(count, amount);
-    if (validError) {
-      this.view.renderCountError(validError);
-      return;
-    }
-    const currentProd = this.model.getProductOnChange();
-    const total_price = this.model.calculatePrice(currentProd.price, count);
-    const changedProd = this.model.setUpParams(this.model.getProductOnChange(), { count, total_price });
-    this.model.setProductOnChange(changedProd);
-    this.view.renderOrderPrice(total_price);
+    this.publisher.notify('SET_TEMPORARY_PRODUCT', addedProd);
+    this.publisher.notify('SHOW_TEMPORARY_PRODUCT');
+    this.publisher.notify('SET_TEMPORARY_AFTERACTIONS', events);
   }
 
   showCart() {
-    this.publisher.notify('SHOW_CART');
+    this.publisher.notify('CLEAN_ACTIONS');
     const cartProducts = this.model.getAllProducts();
     const totalPrice = this.model.getCartPrice();
     this.view.renderCart(cartProducts, totalPrice);

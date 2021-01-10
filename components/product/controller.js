@@ -21,7 +21,7 @@ export default class ProductController {
     this.publisher.subscribe('SHOW_CATEGORIES', this.cleanActions.bind(this));
     this.publisher.subscribe('CHOOSE_CATEGORY', this.filterProducts.bind(this));
     this.publisher.subscribe('PRODUCTS_SOLD', this.changeProductsAmount.bind(this));
-    this.publisher.subscribe('SHOW_CART', this.cleanActions.bind(this));
+    this.publisher.subscribe('CLEAN_ACTIONS', this.cleanActions.bind(this));
     this.model.addAction(this.model.filterProducts.bind(this.model), { params: { type: 'filter', value: 'availbable' }, predicate: 'AVAILABLE' });
   }
 
