@@ -1,6 +1,6 @@
 export default class CartView {
   constructor(callbacks) {
-    this.init();
+    this.initRender();
     this.dom = {
       mainContent: document.querySelector('.main-container'),
       modal: document.querySelector('#mainModal'),
@@ -10,7 +10,7 @@ export default class CartView {
     this.dom.openCart.addEventListener('click', this.callbacks.showCart); 
   }
 
-  init() {
+  initRender() {
     const navbarContainer = document.querySelector('.navbar-nav');
     navbarContainer.insertAdjacentHTML('beforeend', 
     `<li class="nav-item me-4">
@@ -48,16 +48,10 @@ export default class CartView {
     const showHistoryBtn = this.dom.mainContent.querySelector('.show-history');
     showHistoryBtn.addEventListener('click', this.callbacks.showHistory);
     changeBtns.forEach((btn) => {
-      btn.addEventListener('click', (e) => {
-        const id = e.target.dataset.id;
-        this.callbacks.selectProduct(id);
-      });
+      btn.addEventListener('click', this.callbacks.selectProduct);
     });
     deleteBtns.forEach((btn) => {
-      btn.addEventListener('click', (e) => {
-        const id = e.target.dataset.id;
-        this.callbacks.delete(id);
-      })
+      btn.addEventListener('click', this.callbacks.delete);
     });
     makeOrderBtn.addEventListener('click', this.callbacks.showCustomerForm);
   }

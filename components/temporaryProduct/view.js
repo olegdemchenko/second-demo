@@ -46,11 +46,8 @@ export default class TemporaryProductView {
     </div> `;
     const countInput = this.dom.modal.querySelector('input[name="product-count"]');
     const addBtn = this.dom.modal.querySelector('.add-btn');
-    countInput.addEventListener('input', (e) => {
-      const count = Number(e.target.value);
-      this.callbacks.changeCount(product, count);
-    });
-    addBtn.addEventListener('click', () => this.callbacks.send(product));
+    countInput.addEventListener('input', this.callbacks.changeCount);
+    addBtn.addEventListener('click', this.callbacks.send);
   }
 
   renderPrice(price) {

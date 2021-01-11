@@ -10,7 +10,7 @@ export default class ProductController {
       showInfo: this.showProductInfo.bind(this),
       showProducts: this.showProducts.bind(this),
       sort: this.sortProducts.bind(this),
-      search: this.filterProducts.bind(this),
+      search: this.handleSearch.bind(this),
       choose: this.chooseProduct.bind(this),
       deleteAction: this.deleteAction.bind(this),
     };
@@ -18,11 +18,12 @@ export default class ProductController {
     this.model = new ProductModel();
     this.pagination = new PaginationController(this.view.renderProducts.bind(this.view), '.products-container');
     this.publisher.subscribe('LOAD_GOODS', this.setProducts.bind(this));
-    this.publisher.subscribe('SHOW_CATEGORIES', this.cleanActions.bind(this));
-    this.publisher.subscribe('CHOOSE_CATEGORY', this.filterProducts.bind(this));
+    this.publisher.subscribe('SHOW_CATEGORIES', this.setDefaultActions.bind(this));
+    this.publisher.subscribe('CHOOSE_CATEGORY', this.chooseCategory.bind(this));
     this.publisher.subscribe('PRODUCTS_SOLD', this.changeProductsAmount.bind(this));
-    this.publisher.subscribe('CLEAN_ACTIONS', this.cleanActions.bind(this));
-    this.model.addAction(this.model.filterProducts.bind(this.model), { params: { type: 'filter', value: 'availbable' }, predicate: 'AVAILABLE' });
+    this.publisher.subscribe('SHOW_PRODUCTS', this.showProducts.bind(this));
+    this.publisher.subscribe('PRODUCT_TO_CHOOSE', this.chooseProduct.bind(this));
+    this.setDefaultActions();
   }
 
   changeProductsAmount(products) {
@@ -33,15 +34,28 @@ export default class ProductController {
     this.model.setProducts(products);
   }
 
-  cleanActions() {
+  setDefaultActions() {
     this.model.setActions([]);
     this.model.addAction(this.model.filterProducts.bind(this.model), { params: { type: 'filter', value: 'availbable' }, predicate: 'AVAILABLE' });
   }
   
+  chooseCategory(params) {
+    this.setDefaultActions();
+    this.filterProducts(params);
+  }
+
   deleteAction(e) {
     const id = Number(e.target.dataset.actionId);
     this.model.deleteAction(id);
     this.showProducts();
+  }
+
+  handleSearch(e) {
+    e.preventDefault();
+    const property = e.target.elements['search-type'].value;
+    const value = e.target.elements['search-value'].value;
+    this.filterProducts({ property, value });
+    e.target.elements['search-value'].value = '';
   }
 
   filterProducts(params) {
@@ -58,17 +72,20 @@ export default class ProductController {
     this.pagination.showElements();
   }
 
-  sortProducts(sortParam) {
+  sortProducts(e) {
+    const sortParam = e.target.dataset.sort;
     this.model.addAction(this.model.sortProducts, { params: { type: 'sort', property: sortParam } });
     this.showProducts();
   }
 
-  showProductInfo(id) {
+  showProductInfo(e) {
+    const id = e.target.dataset.id;
     const product = this.model.getProduct(id);
-    this.view.renderProductInfo(product);
+    this.publisher.notify('SHOW_PRODUCT_DETAILS', product);
   }
 
-  chooseProduct(currId) {
+  chooseProduct(e) {
+    const currId = e.target.dataset.id;
     const { product_name, price, id, amount } = this.model.getProduct(currId);
     this.publisher.notify('CHOOSE_TO_ADD', { product_name, price, id, amount });
   }

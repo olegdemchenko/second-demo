@@ -9,10 +9,7 @@ export default class PaginationView {
     const container = document.querySelector(this.containerSelector);
     container.insertAdjacentHTML('beforeend', this.renderPagination(page, lastPage));
     const pageButtons = [...document.querySelectorAll('li[data-page-numb]')];
-    pageButtons.forEach((btn) => btn.addEventListener('click', (e) => {
-      const pageNumb = Number(e.currentTarget.dataset.pageNumb);
-      this.callbacks.show(pageNumb, lastPage);
-    }));
+    pageButtons.forEach((btn) => btn.addEventListener('click', this.callbacks.show));
   }
 
   renderPagination(pageNumb, lastPage) {

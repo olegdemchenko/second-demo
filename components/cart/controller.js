@@ -6,7 +6,7 @@ export default class CartController {
     this.publisher = publisher;
     this.listeners = {
       delete: this.deleteFromCart.bind(this),
-      selectProduct: this.prepareAddedProduct.bind(this, ['SHOW_CART']),
+      selectProduct: this.handlePrepareAdded.bind(this, ['SHOW_CART']),
       showCart: this.showCart.bind(this),
       showCustomerForm: this.showCustomerForm.bind(this),
       showHistory: this.showHistory.bind(this),
@@ -27,7 +27,7 @@ export default class CartController {
     const customerProducts = this.model.getAllProducts();
     const order = JSON.stringify({ customerData, customerProducts });
     try {
-     //this.publisher.notify('SEND_OWNER', order);
+      this.publisher.notify('SEND_OWNER', order);
       this.publisher.notify('PRODUCTS_SOLD', customerProducts.map(({ id, count }) => ({ id, count })));
       this.publisher.notify('ADD_ORDER_TO_HISTORY', order);
       this.model.setAllProducts([]);
@@ -55,7 +55,8 @@ export default class CartController {
     this.model.addProduct(prod);
   }
   
-  deleteFromCart(id) {
+  deleteFromCart(e) {
+    const id = e.target.dataset.id;
     this.model.deleteProduct(id);
     this.showCart();
   }
@@ -73,7 +74,12 @@ export default class CartController {
     const normalProd = this.model.setUpParams(newProduct, { total_price: newProduct.price, count: 1 });
     this.publisher.notify('SET_TEMPORARY_PRODUCT', normalProd);
     this.publisher.notify('SHOW_TEMPORARY_PRODUCT');
-   
+    this.publisher.notify('SET_TEMPORARY_AFTERACTIONS', []);
+  }
+
+  handlePrepareAdded(events, e) {
+    const id = e.target.dataset.id;
+    this.prepareAddedProduct(events, id);
   }
 
   prepareAddedProduct(events, id) {
@@ -84,7 +90,6 @@ export default class CartController {
   }
 
   showCart() {
-    this.publisher.notify('CLEAN_ACTIONS');
     const cartProducts = this.model.getAllProducts();
     const totalPrice = this.model.getCartPrice();
     this.view.renderCart(cartProducts, totalPrice);

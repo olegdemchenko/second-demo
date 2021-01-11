@@ -3,14 +3,6 @@ export default class CartModel {
     this.products = [];
     this.productOnChange = null;
   }
-  /*
-  getProductOnChange() {
-    return this.productOnChange;
-  }
-
-  setProductOnChange(prod) {
-    this.productOnChange = prod;
-  }*/
   
   hasProduct(id) {
     return this.getAllProducts().some(({ id: prodId }) => prodId === id);
@@ -49,10 +41,6 @@ export default class CartModel {
     const cartProducts = this.getAllProducts();
     return cartProducts.reduce((summ, { total_price }) => summ + total_price, 0);
   }
-  /*
-  calculatePrice(price, count) {
-    return price * count;
-  }*/
 
   addProduct(product) {
     this.products.push(product);

@@ -28,7 +28,9 @@ export default class TemporaryProductController {
     this.model.setAfterActions(actions);
   }
 
-  changeProdPrice(product, count) {
+  changeProdPrice(e) {
+    const count = Number(e.target.value);
+    const product = this.model.getTempProduct();
     const validError = this.model.validateCount(count, product.amount);
     if (validError) {
       this.view.renderCountError(validError);
@@ -40,7 +42,8 @@ export default class TemporaryProductController {
     this.view.renderPrice(changedProd.total_price);
   }
 
-  sendTempProduct(prod) {
+  sendTempProduct() {
+    const prod = this.model.getTempProduct();
     const actions = this.model.getAfterActions();
     this.publisher.notify('SEND_TEMPORARY_PRODUCT', prod);
     actions.forEach((ev) => this.publisher.notify(ev, prod));

@@ -1,4 +1,3 @@
-//import CustomerInfoModel from './model.js';
 import CustomerInfoView from './view.js';
 
 export default class CustomerInfoController {

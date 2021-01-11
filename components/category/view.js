@@ -1,6 +1,6 @@
 export default class CategoryView {
   constructor(callbacks) {
-    this.init();
+    this.initRender();
     this.dom = {
       dropdown: document.querySelector('.dropdown-menu'),
       mainContainer: document.querySelector('.main-container'),
@@ -8,7 +8,7 @@ export default class CategoryView {
     this.callbacks = callbacks;
   }
 
-  init() {
+  initRender() {
     const navbarContainer = document.querySelector('.navbar-nav');
     navbarContainer.insertAdjacentHTML('beforeend', 
     `<li class="nav-item dropdown me-4">
