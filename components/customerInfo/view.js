@@ -16,24 +16,54 @@ export default class CustomerInfoView {
         <div class="modal-body">
           <form class="personal-data-form">
             <label for="userName">Please, enter your name:</label>
-            <input type="text" class="form-control" name="user-name" id="userName" required pattern="[a-zA-Z]{2,}">
+            <input type="text" class="form-control" name="name" id="userName"  required pattern="[a-zA-Z]{2,}">
             <label for="userPhone">Please, enter your phone number:</label>
             <div class="input-group mb-3">
               <span class="input-group-text">000-000-00-00</span>
-              <input type="tel" class="form-control" id="userPhone" name="user-phone" required pattern="[0-9]{3}-[0-9]{3}-[0-9]{2}-[0-9]{2}">
+              <input type="tel" class="form-control" id="userPhone" name="phone"  required pattern="[0-9]{3}-[0-9]{3}-[0-9]{2}-[0-9]{2}">
             </div>
             <label for="userEmail">Please, enter your email:</label>
             <div class="input-group mb-3">
               <span class="input-group-text">username@example.com</span>
-              <input type="email" class="form-control" id="userEmail" name="user-email">
+              <input type="email" class="form-control" id="userEmail"  name="email">
             </div>
-            <button type="submit" class="btn btn-primary buy-btn" >Buy</button>       
+            <div class="d-flex justify-content-center"><button type="submit" style="width: 100px;" class="btn btn-primary buy-btn" disabled>Buy</button></div>
           </form>
         </div>
       </div>
-    `
+    `;
     const dataForm = document.querySelector('.personal-data-form');
+    dataForm.addEventListener('input', this.callbacks.validate);
     dataForm.addEventListener('submit', this.callbacks.buy);
+  }
+
+  renderValidationRes(results) {
+    results.forEach(([type, valid]) => {
+      if (valid) {
+        this.renderValidInput(type);
+        return;
+      }
+      this.renderInvalidInput(type);
+    });
+    const allInputsValid = results.every(([, valid]) => valid);
+    const buyBtn = this.dom.modal.querySelector('.buy-btn');
+    if (allInputsValid) {
+      buyBtn.disabled = false;
+    } else {
+      buyBtn.disabled = true;
+    }
+  }
+
+  renderValidInput(type) {
+    const input = this.dom.modal.querySelector(`input[name=${type}]`);
+    input.classList.remove('is-invalid');
+    input.classList.add('is-valid');
+  }
+
+  renderInvalidInput(type) {
+    const input = this.dom.modal.querySelector(`input[name=${type}]`);
+    input.classList.remove('is-valid');
+    input.classList.add('is-invalid');
   }
 
   renderPurchaseSuccess() {

@@ -57,6 +57,8 @@ export default class TemporaryProductView {
     countInput.classList.remove('is-invalid');
     const priceField = document.querySelector('.order-total-price');
     priceField.textContent = price;
+    const addBtn = this.dom.modal.querySelector('.add-btn');
+    addBtn.disabled = false;
   }
 
   renderCountError(err) {
@@ -67,5 +69,7 @@ export default class TemporaryProductView {
     errField.hidden = false;
     const totalPrice = this.dom.modal.querySelector('.order-total-price');
     totalPrice.textContent = '';
+    const addBtn = this.dom.modal.querySelector('.add-btn');
+    addBtn.disabled = true;
   }
 }

@@ -65,7 +65,7 @@ export default class ProductView {
 
   renderAction({ id, params: { params } }) {
     return `
-      <div class="d-inline-block bg-primary rounded-3 text-light p-3 mt-e ms-3 ">
+      <div class="d-inline-block bg-primary rounded-3 text-light p-3 mt-3 ms-3 ">
         <strong class="align-top">${Object.values(params).join(',  ')}</strong>
         <button type="button" class="btn-close ms-2 delete-action" data-action-id="${id}"></button>
       </div>

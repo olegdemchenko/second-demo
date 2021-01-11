@@ -75,11 +75,9 @@ export default class ProductModel {
   filterProducts({ predicate, params }, products) {
     const predicates = this.getPredicates();
     return products.filter((prod) => predicates[predicate](prod, params));
-    //return products.filter(({ [property]: propValue }) => propValue.includes(value));
   }
 
   setProducts(products) {
-    console.log(products);
     this.products = products;
   }
 
@@ -88,7 +86,7 @@ export default class ProductModel {
   }
 
   sortProducts({ params: { property } }, products) {
-    return products.sort((a, b) => a[property] - b[property]);
+    return [...products].sort((a, b) => a[property] - b[property]);
   }
 
 }

@@ -11,7 +11,7 @@ export default class ProductController {
       showProducts: this.showProducts.bind(this),
       sort: this.sortProducts.bind(this),
       search: this.handleSearch.bind(this),
-      choose: this.chooseProduct.bind(this),
+      choose: this.handleChoose.bind(this),
       deleteAction: this.deleteAction.bind(this),
     };
     this.view = new ProductView(this.listeners);
@@ -84,8 +84,12 @@ export default class ProductController {
     this.publisher.notify('SHOW_PRODUCT_DETAILS', product);
   }
 
-  chooseProduct(e) {
+  handleChoose(e) {
     const currId = e.target.dataset.id;
+    this.chooseProduct(currId);
+  }
+
+  chooseProduct(currId) {
     const { product_name, price, id, amount } = this.model.getProduct(currId);
     this.publisher.notify('CHOOSE_TO_ADD', { product_name, price, id, amount });
   }
