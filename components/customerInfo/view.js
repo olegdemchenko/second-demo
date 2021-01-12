@@ -16,11 +16,11 @@ export default class CustomerInfoView {
         <div class="modal-body">
           <form class="personal-data-form">
             <label for="userName">Please, enter your name:</label>
-            <input type="text" class="form-control" name="name" id="userName"  required pattern="[a-zA-Z]{2,}">
+            <input type="text" class="form-control" name="name" id="userName"  required >
             <label for="userPhone">Please, enter your phone number:</label>
             <div class="input-group mb-3">
               <span class="input-group-text">000-000-00-00</span>
-              <input type="tel" class="form-control" id="userPhone" name="phone"  required pattern="[0-9]{3}-[0-9]{3}-[0-9]{2}-[0-9]{2}">
+              <input type="tel" class="form-control" id="userPhone" name="phone"  required >
             </div>
             <label for="userEmail">Please, enter your email:</label>
             <div class="input-group mb-3">
