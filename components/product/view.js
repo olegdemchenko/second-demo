@@ -40,7 +40,7 @@ export default class ProductView {
       return;
     }
     productsContainer.innerHTML = 
-    `<div class="row justify-content-center p-3"><a href="#" class="col-2 d-block btn btn-primary" data-sort="price">Sort by price</a></div>
+    `<div class="d-flex justify-content-center p-3"><a href="#" class="d-block btn btn-primary px-5" data-sort="price">Sort by price</a></div>
      ${products.map(this.renderProductCard).join('')}
     `;
     const sortButton = productsContainer.querySelector('a[data-sort]');
@@ -82,8 +82,8 @@ export default class ProductView {
              <p class="card-text">Manufacture: ${product.manufacture}</p>
              <p class="card-text">Price: ${product.price}</p>
              <p class="card-text">Units: ${product.units}</p>
-             <a href="#" class="btn btn-primary product-buy" data-id="${product.id}" data-bs-toggle="modal" data-bs-target="#mainModal">Add to cart</a>
-             <a href="#" class="btn btn-primary product-info" data-id="${product.id}">More info</a>
+             <a href="#" class="btn btn-primary mt-1 product-buy" data-id="${product.id}" data-bs-toggle="modal" data-bs-target="#mainModal">Add to cart</a>
+             <a href="#" class="btn btn-primary mt-1 product-info" data-id="${product.id}">More info</a>
            </div>
          </div>
        </div>`
