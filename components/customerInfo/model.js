@@ -6,7 +6,7 @@ export default class CustomerInfoModel {
       email: '',
     };
     this.patterns = {
-      name: /[a-zA-Z]{2,}/,
+      name: /[a-zA-Z ]{2,}/,
       phone: /[0-9]{3}-[0-9]{3}-[0-9]{2}-[0-9]{2}/,
       email: /@[a-z]{3,5}\.[a-z]{2,3}/,
     };
