@@ -79,6 +79,7 @@ export default class ProductView {
            <img src="${product.img_link}" class="card-img-top" style="width: 200px; height:200px" alt="...">
            <div class="card-body">
              <h5 class="card-title">${product.product_name}</h5>
+             <p class="card-text">Manufacture: ${product.manufacture}</p>
              <p class="card-text">Price: ${product.price}</p>
              <p class="card-text">Units: ${product.units}</p>
              <a href="#" class="btn btn-primary product-buy" data-id="${product.id}" data-bs-toggle="modal" data-bs-target="#mainModal">Add to cart</a>

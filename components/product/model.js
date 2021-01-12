@@ -78,6 +78,7 @@ export default class ProductModel {
   }
 
   setProducts(products) {
+    console.log(products);
     this.products = products;
   }
 
